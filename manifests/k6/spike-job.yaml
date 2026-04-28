@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-spike-test
+  namespace: default
+data:
+  spike-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export const options = {
+      stages: [
+        { duration: '30s', target: 50 },
+        { duration: '2m',  target: 50 },
+        { duration: '30s', target: 0 },
+      ],
+      thresholds: {
+        http_req_duration: ['p(99)<1000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    export default function () {
+      const res = http.get('http://ingress-nginx-controller.ingress-nginx.svc.cluster.local/', {
+        headers: { Host: 'orders.lab.local' },
+      });
+      check(res, {
+        'status is 200': (r) => r.status === 200,
+      });
+      sleep(0.1);
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-spike
+  namespace: default
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "/scripts/spike-test.js"]
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: k6-spike-test

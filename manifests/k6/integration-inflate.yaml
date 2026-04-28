@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-inflate
+  namespace: default
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: integration-inflate
+  template:
+    metadata:
+      labels:
+        app: integration-inflate
+    spec:
+      containers:
+        - name: pause
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+          resources:
+            requests:
+              cpu: "800m"
+              memory: "256Mi"
