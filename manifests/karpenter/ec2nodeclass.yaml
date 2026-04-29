@@ -12,3 +12,7 @@ spec:
   securityGroupSelectorTerms:
     - tags:
         karpenter.sh/discovery: "platform-sandbox"
+  tags:
+    Name: "karpenter-platform-sandbox"
+    Environment: "sandbox"
+    ManagedBy: "karpenter"
