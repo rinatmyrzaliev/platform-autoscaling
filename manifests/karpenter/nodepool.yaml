@@ -15,7 +15,7 @@ spec:
           values: ["spot"]
         - key: node.kubernetes.io/instance-type
           operator: In
-          values: ["t3.medium", "t3.large", "t3a.medium", "t3a.large"]
+          values: ["t3.medium", "t3a.medium"]
         - key: topology.kubernetes.io/zone
           operator: In
           values: ["us-east-1a", "us-east-1b"]
